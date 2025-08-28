@@ -1,12 +1,6 @@
 <script>
-  import { onMount } from "svelte";
   let { children } = $props();
   import "../app.css";
-  import { store } from "$lib/store.svelte";
-
-  onMount(async () => {
-    await store.sync();
-  });
 </script>
 
 <div class="flex h-screen flex-col">
