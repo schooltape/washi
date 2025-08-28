@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "@catppuccin/tailwindcss/mocha.css";
+
+@layer base {
+  h1 {
+    font-size: var(--text-2xl);
+  }
+  h2 {
+    font-size: var(--text-xl);
+  }
+  body {
+    @apply bg-ctp-base text-ctp-text;
+  }
+}
+
+@layer components {
+  .card {
+    @apply flex flex-col gap-4 rounded-lg bg-ctp-mantle p-4;
+  }
+  .subtext-sm {
+    @apply text-sm text-ctp-subtext0;
+  }
+}
