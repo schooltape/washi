@@ -1,9 +1,6 @@
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
-  import { fetch } from "@tauri-apps/plugin-http";
-  import { fetcher, wrapper } from "$lib/fetch";
-  import RangeCalendar from "../../components/RangeCalendar.svelte";
+  import { fetcher, scraper } from "$lib/fetch";
   import { type SchoolboxEvent } from "serrator/types";
   import { startOfWeek, endOfWeek } from "date-fns";
   import { getCalendar } from "serrator/wrappers";
@@ -16,7 +13,7 @@
     const date = new Date();
 
     try {
-      const user = getDashboard(await (await fetcher("/")).text()).user;
+      const user = (await scraper("/", getDashboard)).user;
       timetable = await getCalendar(fetcher, user.id, startOfWeek(date), endOfWeek(date), true);
     } catch (error) {
       console.error("Error fetching timetable:", error);

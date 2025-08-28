@@ -14,16 +14,16 @@ export async function fetcher(pathname: string, params?: URLSearchParams): Promi
   });
 }
 
-export async function wrapper(func: any, params: any) {
-  return func(fetcher, ...params);
-}
+export async function scraper<T>(pathname: string, scraper: (document: Document) => T): Promise<T> {
+  const schoolboxUrl = await store.get("schoolboxUrl");
+  const schoolboxJwt = await store.get("schoolboxJwt");
 
-export async function scraper<T>(pathname: string, scraper: (html: string) => T): Promise<T> {
-  const response = await fetch(pathname, {
+  const response = await fetch(`${schoolboxUrl}${pathname}`, {
     headers: {
-      Authorization: `Bearer ${store.get("schoolboxJwt")}`,
+      Authorization: `Bearer ${schoolboxJwt}`,
     },
   });
   const html = await response.text();
-  return scraper(html);
+  const document = new DOMParser().parseFromString(html, "text/html");
+  return scraper(document);
 }
