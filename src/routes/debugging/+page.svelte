@@ -1,13 +1,6 @@
 <script lang="ts">
-  import { store } from "$lib/store";
-  import { onMount } from "svelte";
-  import Button from "../../components/Button.svelte";
-
-  let entries: [key: string, value: unknown][] = [];
-
-  onMount(async () => {
-    entries = await store.entries();
-  });
+  import Button from "$components/Button.svelte";
+  import { store } from "$lib/store.svelte";
 </script>
 
 <main class="p-4">
@@ -24,7 +17,7 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-ctp-overlay0">
-      {#each entries as [key, value]}
+      {#each Object.entries(store.state) as [key, value]}
         <tr class="divide-x divide-ctp-overlay0">
           <td class="px-4 py-2">{key}</td>
           <td class="max-w-xs truncate px-4 py-2">{JSON.stringify(value)}</td>
@@ -33,5 +26,5 @@
     </tbody>
   </table>
 
-  <Button onclick={() => store.reset()}>Reset Store</Button>
+  <Button onclick={() => store.store.reset()}>Reset Store</Button>
 </main>

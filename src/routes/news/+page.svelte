@@ -2,7 +2,7 @@
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
   import { fetch } from "@tauri-apps/plugin-http";
-  import { store } from "../../lib/store";
+  import { store } from "$lib/store.svelte";
 
   let newsFeed = $state([]);
 
@@ -12,15 +12,13 @@
 
   async function fetchNews() {
     console.log("hello");
-    const schoolboxUrl = await store.get("schoolboxUrl");
-    const schoolboxJwt = await store.get("jwt");
 
-    const response = await fetch(`${schoolboxUrl}/news/lists/feed`, {
+    const response = await fetch(`${store.state.auth.url}/news/lists/feed`, {
       method: "GET",
       headers: [
         ["Content-Type", "application/json"],
         ["Accept", "application/json"],
-        ["Authorization", `Bearer ${schoolboxJwt}`],
+        ["Authorization", `Bearer ${store.state.auth.jwt}`],
       ],
     });
 

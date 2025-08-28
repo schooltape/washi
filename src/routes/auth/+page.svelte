@@ -3,12 +3,12 @@
   import { ArrowBigLeft, Braces, CircleCheck, CircleQuestionMark, CircleX, LoaderCircle, Lock } from "@lucide/svelte";
   import { fade, slide } from "svelte/transition";
   import { asset } from "$app/paths";
-  import Button from "../../components/Button.svelte";
-  import TextInput from "../../components/TextInput.svelte";
-  import { store } from "../../lib/store";
+  import Button from "$components/Button.svelte";
+  import TextInput from "$components/TextInput.svelte";
   import { fetch } from "@tauri-apps/plugin-http";
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import { onMount } from "svelte";
+  import { store } from "$lib/store.svelte";
 
   type AuthStage = "url" | "jwt" | "success" | "error";
 
@@ -62,8 +62,10 @@
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        store.set("schoolboxJwt", schoolboxJwt);
-        store.set("schoolboxUrl", schoolboxUrl);
+        store.store.set("auth", {
+          jwt: schoolboxJwt,
+          url: schoolboxUrl,
+        });
         statusMessage = `Authenticated as ${data.createdBy}`;
         authStage = "success";
       } else {
