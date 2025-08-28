@@ -34,7 +34,7 @@
     "prettier-plugin-organize-imports": "^4.2.0",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "serrator": "link:serrator",
+    "serrator": "github:schooltape/serrator",
     "svelte": "^5.38.3",
     "svelte-check": "^4.3.1",
     "tailwindcss": "^4.1.12",
