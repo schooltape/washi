@@ -1,36 +1,13 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { fetcher, scraper } from "$lib/fetch";
-  import { type SchoolboxEvent } from "serrator/types";
-  import { startOfWeek, endOfWeek } from "date-fns";
-  import { getCalendar } from "serrator/wrappers";
-  import { getDashboard } from "serrator/scrapers";
-
-  let timetable: SchoolboxEvent[] = $state([]);
-
-  onMount(async () => {
-    // get start of week using https://react-spectrum.adobe.com/internationalized/date/index.html
-    const date = new Date();
-
-    try {
-      const user = (await scraper("/", getDashboard)).user;
-      timetable = await getCalendar(fetcher, user.id, startOfWeek(date), endOfWeek(date), true);
-    } catch (error) {
-      console.error("Error fetching timetable:", error);
-    }
-  });
+  import { store } from "$lib/store.svelte";
 </script>
 
 <main>
-  <!-- <RangeCalendar /> -->
-
-  {#if timetable}
+  {#if store.timetable}
     <div class="flex flex-col gap-4">
-      {#each timetable as item}
+      {#each store.timetable as item}
         <p>{item.title}</p>
       {/each}
     </div>
-  {:else}
-    <p>Timetable not available.</p>
   {/if}
 </main>
