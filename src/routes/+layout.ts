@@ -5,8 +5,17 @@ export const prerender = true;
 export const ssr = false;
 
 import { store } from "$lib/store.svelte";
+import { redirect } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 
-export const load: LayoutLoad = async () => {
+export const load: LayoutLoad = async ({ url }) => {
   await store.sync();
+
+  const isSignedIn = !!store.state.auth.jwt;
+
+  if (!isSignedIn && url.pathname !== "/auth") {
+    throw redirect(302, "/auth");
+  }
+
+  return {};
 };

@@ -45,9 +45,11 @@
     if (!schoolboxUrl.startsWith("https://")) {
       schoolboxUrl = "https://" + schoolboxUrl;
     }
+
+    // trim quotes from schoolboxJwt
+    schoolboxJwt = schoolboxJwt.replace('"', "");
+
     // verify JWT is valid
-    // make API request to schoolboxUrl
-    // handle response
     try {
       const response = await fetch(`${schoolboxUrl}/user/token`, {
         method: "GET",
