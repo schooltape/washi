@@ -2,9 +2,11 @@ import { fetch } from "@tauri-apps/plugin-http";
 import { store } from "./store.svelte";
 
 export async function fetcher(pathname: string, params?: URLSearchParams): Promise<Response> {
-  return fetch(`${store.state.auth.url}${pathname}${params ? `?${params.toString()}` : ""}`, {
+  const url = `${store.state.auth?.url}${pathname}${params ? `?${params.toString()}` : ""}`;
+  console.log(`Fetching ${url}`);
+  return fetch(url, {
     headers: {
-      Authorization: `Bearer ${store.state.auth.jwt}`,
+      Authorization: `Bearer ${store.state.auth?.jwt}`,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
@@ -12,9 +14,11 @@ export async function fetcher(pathname: string, params?: URLSearchParams): Promi
 }
 
 export async function scraper<T>(pathname: string, scraper: (document: Document) => T): Promise<T> {
-  const response = await fetch(`${store.state.auth.url}${pathname}`, {
+  const url = `${store.state.auth?.url}${pathname}`;
+  console.log(`Scraping ${url}`);
+  const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${store.state.auth.jwt}`,
+      Authorization: `Bearer ${store.state.auth?.jwt}`,
     },
   });
   const html = await response.text();
