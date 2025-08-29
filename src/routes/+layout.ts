@@ -11,7 +11,7 @@ import type { LayoutLoad } from "./$types";
 export const load: LayoutLoad = async ({ url }) => {
   await store.sync();
 
-  const isSignedIn = !!store.state.auth.jwt;
+  const isSignedIn = !!store.state.auth;
 
   if (!isSignedIn && url.pathname !== "/auth") {
     throw redirect(302, "/auth");

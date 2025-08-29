@@ -6,8 +6,8 @@ export type StoreData = {
   //   accent: string;
   // }
   auth: {
-    jwt: string | null;
-    url: string | null;
-  };
-  cache: Record<string, string>;
+    jwt: string;
+    url: string;
+  } | null;
+  cache: Record<string, any>;
 };

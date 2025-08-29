@@ -9,6 +9,7 @@
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import { onMount } from "svelte";
   import { store } from "$lib/store.svelte";
+  import { goto } from "$app/navigation";
 
   type AuthStage = "url" | "jwt" | "success" | "error";
 
@@ -70,6 +71,9 @@
         });
         statusMessage = `Authenticated as ${data.createdBy}`;
         authStage = "success";
+        setTimeout(() => {
+          goto("/");
+        }, 300);
       } else {
         const e = `Failed to verify JWT, status code: ${response.status}`;
         console.error(e);
