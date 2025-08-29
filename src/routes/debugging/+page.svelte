@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { invalidateAll } from "$app/navigation";
   import Button from "$components/Button.svelte";
   import { store } from "$lib/store.svelte";
 </script>
@@ -26,5 +27,9 @@
     </tbody>
   </table>
 
-  <Button onclick={() => store.store.reset()}>Reset Store</Button>
+  <Button
+    onclick={() => {
+      store.reset();
+      invalidateAll();
+    }}>Reset Store</Button>
 </main>
