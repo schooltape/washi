@@ -1,9 +1,9 @@
 import { fetcher, scraper } from "$lib/fetch";
-import { LazyStore } from "@tauri-apps/plugin-store";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { getDashboard, getHomepage } from "serrator/scrapers";
 import type { SchoolboxDashboard, SchoolboxEvent, SchoolboxHomepage } from "serrator/types";
 import { getCalendar } from "serrator/wrappers";
+import { PersistentStore } from "./store.svelte";
 
 type CacheData = {
   dashboard?: SchoolboxDashboard;
@@ -12,49 +12,32 @@ type CacheData = {
   homepages?: Record<string, SchoolboxHomepage>;
 };
 
-class Cache {
-  private defaults: CacheData = {};
-
-  state = $state(this.defaults);
-  store: LazyStore;
-  initialised: boolean = $state(false);
+class Cache extends PersistentStore<CacheData> {
   homepage: CacheItem<SchoolboxHomepage>;
   dashboard: CacheItem<SchoolboxDashboard>;
   timetable: CacheItem<SchoolboxEvent[]>;
 
   constructor() {
-    this.store = new LazyStore("cache.json", { defaults: this.defaults });
-    this.store.onChange(() => this.sync());
+    super("cache.json", {});
     this.homepage = new CacheItem<SchoolboxHomepage>(
-      cache,
+      this,
       (id: string) => `homepage-${id}`,
       (id: string) => scraper(`/homepage/${id}`, getHomepage),
     );
-    this.dashboard = new CacheItem<SchoolboxDashboard>(cache, "dashboard", () => scraper("/", getDashboard));
-    this.timetable = new CacheItem<SchoolboxEvent[]>(cache, "timetable", async () => {
+    this.dashboard = new CacheItem<SchoolboxDashboard>(this, "dashboard", () => scraper("/", getDashboard));
+    this.timetable = new CacheItem<SchoolboxEvent[]>(this, "timetable", async () => {
       const date = new Date();
-      const dashboard = await cache.dashboard.get();
+      const dashboard = await this.dashboard.get();
       return getCalendar(fetcher, dashboard.user.id, startOfWeek(date), endOfWeek(date), true);
     });
   }
 
-  /**
-   * syncs the values of the LazyStore with the Svelte state rune
-   */
-  async sync() {
-    this.initialised = true;
-    Object.assign(this.state, Object.fromEntries(await this.store.entries()));
-    // [TODO] does this work?
-    // this.state = Object.fromEntries(await this.store.entries());
-  }
-
-  public async update<T>(key: string, fetcher: () => Promise<T>) {
+  async update<T>(key: string, fetcher: () => Promise<T>) {
     const value = await fetcher();
     this.store.set(key, value);
-    // store state will be updated automatically (onChange)
   }
 
-  public async get<T>(key: string): Promise<T | undefined> {
+  async get<T>(key: string): Promise<T | undefined> {
     return await this.store.get(key);
   }
 }

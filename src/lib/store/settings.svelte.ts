@@ -1,4 +1,4 @@
-import { LazyStore } from "@tauri-apps/plugin-store";
+import { PersistentStore } from "./store.svelte";
 
 type SettingsData = {
   stateVersion: number;
@@ -13,32 +13,17 @@ type SettingsData = {
   } | null;
 };
 
-class Settings {
-  private defaults = {
-    stateVersion: 1,
-    auth: null,
-    // theme: {
-    //   sync: true,
-    //   flavour: "macchiato",
-    //   accent: "pink"
-    // },
-  };
-
-  state: SettingsData = $state(this.defaults);
-  store: LazyStore;
-  initialised: boolean = $state(false);
-
+class Settings extends PersistentStore<SettingsData> {
   constructor() {
-    this.store = new LazyStore("settings.json", { defaults: this.defaults });
-    this.store.onChange(() => this.sync());
-  }
-
-  /**
-   * syncs the values of the LazyStore with the Svelte state rune
-   */
-  async sync() {
-    this.initialised = true;
-    Object.assign(this.state, Object.fromEntries(await this.store.entries()));
+    super("settings.json", {
+      stateVersion: 1,
+      auth: null,
+      // theme: {
+      //   sync: true,
+      //   flavour: "macchiato",
+      //   accent: "pink"
+      // },
+    });
   }
 }
 
