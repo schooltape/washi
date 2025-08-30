@@ -1,4 +1,4 @@
-export type StoreData = {
+export type Settings = {
   stateVersion: number;
   // theme: {
   //   sync: boolean;
@@ -9,5 +9,11 @@ export type StoreData = {
     jwt: string;
     url: string;
   } | null;
-  cache: Record<string, any>;
+};
+
+export type Cache = {
+  dashboard?: SchoolboxDashboard;
+  timetable?: SchoolboxEvent[];
+  // key represents the numeric id of the homepage
+  homepages?: Record<string, SchoolboxHomepage>;
 };

@@ -1,11 +1,19 @@
 <script lang="ts">
-  import { store } from "$lib/store.svelte";
+  import { cache } from "$lib/store.svelte";
+  import { Clock } from "@lucide/svelte";
+  import { onMount } from "svelte";
+
+  onMount(() => {
+    cache.timetable.update();
+  });
 </script>
 
 <main>
-  {#if store.timetable}
+  <h1 class="flex items-center gap-2"><Clock class="stroke-ctp-pink" /> Timetable</h1>
+
+  {#if cache.state.timetable}
     <div class="flex flex-col gap-4">
-      {#each store.timetable as item}
+      {#each cache.state.timetable as item}
         <p>{item.title}</p>
       {/each}
     </div>

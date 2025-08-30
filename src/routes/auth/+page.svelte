@@ -8,7 +8,7 @@
   import { fetch } from "@tauri-apps/plugin-http";
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import { onMount } from "svelte";
-  import { store } from "$lib/store.svelte";
+  import { settings } from "$lib/store.svelte";
   import { goto } from "$app/navigation";
 
   type AuthStage = "url" | "jwt" | "success" | "error";
@@ -65,7 +65,7 @@
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        store.store.set("auth", {
+        settings.store.set("auth", {
           jwt: schoolboxJwt,
           url: schoolboxUrl,
         });

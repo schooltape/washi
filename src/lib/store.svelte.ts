@@ -1,72 +1,148 @@
 import { LazyStore } from "@tauri-apps/plugin-store";
 import { endOfWeek, startOfWeek } from "date-fns";
-import { getDashboard } from "serrator/scrapers";
-import type { SchoolboxDashboard, SchoolboxEvent } from "serrator/types";
+import { getDashboard, getHomepage } from "serrator/scrapers";
+import type { SchoolboxDashboard, SchoolboxEvent, SchoolboxHomepage } from "serrator/types";
 import { getCalendar } from "serrator/wrappers";
 import { fetcher, scraper } from "./fetch";
-import type { StoreData } from "./store";
+import type * as Types from "./store";
 
-const defaults: StoreData = {
-  stateVersion: 1,
-  auth: null,
-  cache: {},
-  // theme: {
-  //   sync: true,
-  //   flavour: "macchiato",
-  //   accent: "pink"
-  // },
-};
+class Settings {
+  private defaults = {
+    stateVersion: 1,
+    auth: null,
+    // theme: {
+    //   sync: true,
+    //   flavour: "macchiato",
+    //   accent: "pink"
+    // },
+  };
 
-class Store {
-  public state: StoreData = $state(defaults);
+  public state: Types.Settings = $state(this.defaults);
   public store: LazyStore;
   public initialised: boolean = $state(false);
-  dashboard: SchoolboxDashboard | null = $state(null);
-  timetable: SchoolboxEvent[] | null = $state(null);
 
   constructor() {
-    this.store = new LazyStore("settings.json", { defaults });
-
+    this.store = new LazyStore("settings.json", { defaults: this.defaults });
     this.store.onChange(() => this.sync());
   }
 
+  /**
+   * syncs the values of the LazyStore with the Svelte state rune
+   */
   async sync() {
     this.initialised = true;
     Object.assign(this.state, Object.fromEntries(await this.store.entries()));
-    if (this.state.auth !== null) {
-      await this.updateDashboard();
-      await this.updateTimetable();
-    } else {
-      console.warn("not syncing store, no authentication data found");
-    }
-  }
-
-  cache<T>(key: string, value: T) {
-    this.state.cache[key] = value;
-    this.store.set(key, value);
-  }
-
-  async updateDashboard() {
-    await this.updateCache("dashboard", () => scraper("/", getDashboard));
-  }
-
-  async updateTimetable() {
-    const date = new Date();
-    await this.updateCache("timetable", () =>
-      getCalendar(fetcher, this.state.cache["dashboard"]?.user?.id, startOfWeek(date), endOfWeek(date), true),
-    );
-  }
-
-  private async updateCache<T>(key: string, fetcher: () => Promise<T>) {
-    const value = await fetcher();
-    (this as any)[key] = value;
-    this.state.cache[key] = value;
-  }
-
-  reset() {
-    this.store.reset();
-    this.sync();
   }
 }
 
-export const store = new Store();
+/**
+ * provides methods to update specific cache entries
+ *
+ * @example
+ * // updates the value of Cache.timetable which then updates the store (and is synced with the state automatically)
+ * cache.updateTimetable();
+ *
+ * // access the data from the Svelte state rune
+ * $inspect(cache.timetable);
+ *
+ * @example
+ * // initiate the default cache values
+ * cache.init();
+ */
+class Cache {
+  private defaults: Types.Cache = {};
+
+  public state = $state(this.defaults);
+  public store: LazyStore;
+  public initialised: boolean = $state(false);
+
+  public homepage: HomepageCache;
+  public dashboard: DashboardCache;
+  public timetable: TimetableCache;
+
+  constructor() {
+    this.store = new LazyStore("cache.json", { defaults: this.defaults });
+    this.store.onChange(() => this.sync());
+    this.homepage = new HomepageCache(this);
+    this.dashboard = new DashboardCache(this);
+    this.timetable = new TimetableCache(this);
+  }
+
+  /**
+   * syncs the values of the LazyStore with the Svelte state rune
+   */
+  async sync() {
+    this.initialised = true;
+    Object.assign(this.state, Object.fromEntries(await this.store.entries()));
+    // [TODO] does this work?
+    // this.state = Object.fromEntries(await this.store.entries());
+  }
+
+  public async update<T>(key: string, fetcher: () => Promise<T>) {
+    const value = await fetcher();
+    this.store.set(key, value);
+    // store state will be updated automatically (onChange)
+  }
+
+  public async get<T>(key: string): Promise<T | undefined> {
+    return await this.store.get(key);
+  }
+}
+
+class DashboardCache {
+  constructor(private cache: Cache) {
+    this.cache = cache;
+  }
+
+  async get(): Promise<SchoolboxDashboard> {
+    const cached = await this.cache.get<SchoolboxDashboard>("dashboard");
+    if (cached) return cached;
+    await this.update();
+    return (await this.cache.get("dashboard")) as SchoolboxDashboard;
+  }
+
+  async update() {
+    await this.cache.update("dashboard", () => scraper("/", getDashboard));
+  }
+}
+
+class TimetableCache {
+  constructor(private cache: Cache) {
+    this.cache = cache;
+  }
+
+  async get(): Promise<SchoolboxEvent[]> {
+    const cached = await this.cache.get<SchoolboxEvent[]>("timetable");
+    if (cached) return cached;
+    await this.update();
+    return (await this.cache.get("timetable")) as SchoolboxEvent[];
+  }
+
+  async update() {
+    const date = new Date();
+    await this.cache.update("timetable", async () => {
+      const dashboard = await this.cache.dashboard.get();
+      return getCalendar(fetcher, dashboard.user.id, startOfWeek(date), endOfWeek(date), true);
+    });
+  }
+}
+
+class HomepageCache {
+  constructor(private cache: Cache) {
+    this.cache = cache;
+  }
+
+  async get(id: string): Promise<SchoolboxHomepage> {
+    const cached = await this.cache.get<SchoolboxHomepage>(`homepage-${id}`);
+    if (cached) return cached;
+    await this.update(id);
+    return (await this.cache.get(`homepage-${id}`)) as SchoolboxHomepage;
+  }
+
+  async update(id: string) {
+    await this.cache.update(`homepage-${id}`, () => scraper(`/homepage/${id}`, getHomepage));
+  }
+}
+
+export const settings = new Settings();
+export const cache = new Cache();

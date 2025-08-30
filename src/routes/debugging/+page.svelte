@@ -1,15 +1,31 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import Button from "$components/Button.svelte";
-  import { store } from "$lib/store.svelte";
+  import { cache, settings } from "$lib/store.svelte";
 </script>
 
 <main class="p-4">
   <h1>Debugging</h1>
   <p>This page exists purely for debugging purposes and will be excluded from production builds.</p>
 
-  <h2>Store</h2>
+  <h2>Settings</h2>
+  {@render stateTable(settings.state)}
+  <Button
+    onclick={async () => {
+      await settings.store.reset();
+      invalidateAll();
+    }}>Reset Store</Button>
 
+  <h2>Cache</h2>
+  {@render stateTable(cache.state)}
+  <Button
+    onclick={async () => {
+      await cache.store.reset();
+      invalidateAll();
+    }}>Reset Store</Button>
+</main>
+
+{#snippet stateTable(state: Record<string, any>)}
   <table class="min-w-full divide-y divide-ctp-overlay0 border border-ctp-overlay0">
     <thead class="bg-ctp-mantle">
       <tr class="divide-x">
@@ -18,7 +34,7 @@
       </tr>
     </thead>
     <tbody class="divide-y divide-ctp-overlay0">
-      {#each Object.entries(store.state) as [key, value]}
+      {#each Object.entries(state) as [key, value]}
         <tr class="divide-x divide-ctp-overlay0">
           <td class="px-4 py-2">{key}</td>
           <td class="max-w-xs truncate px-4 py-2">{JSON.stringify(value)}</td>
@@ -26,10 +42,8 @@
       {/each}
     </tbody>
   </table>
-
   <Button
     onclick={() => {
-      store.reset();
-      invalidateAll();
-    }}>Reset Store</Button>
-</main>
+      console.log($state.snapshot(state));
+    }}>Log Store</Button>
+{/snippet}
