@@ -21,7 +21,6 @@
     <a href="/auth">Auth</a>
     <a href="/timetable">Timetable</a>
     <a href="/debugging">Debugging</a>
-    <a href="/settings">Settings</a>
   </nav>
 
   <div class="flex-grow">
