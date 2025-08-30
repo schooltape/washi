@@ -4,7 +4,7 @@
 export const prerender = true;
 export const ssr = false;
 
-import { cache, settings } from "$lib/store.svelte";
+import { cache, settings } from "$lib/store";
 import { redirect } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 

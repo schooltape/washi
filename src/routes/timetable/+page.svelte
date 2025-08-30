@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cache } from "$lib/store.svelte";
+  import { cache } from "$lib/store";
   import { Clock } from "@lucide/svelte";
   import { onMount } from "svelte";
 

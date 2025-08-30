@@ -1,7 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import Button from "$components/Button.svelte";
-  import { cache, settings } from "$lib/store.svelte";
+  import { cache, settings } from "$lib/store";
 </script>
 
 <main class="p-4">

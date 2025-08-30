@@ -8,8 +8,8 @@
   import { fetch } from "@tauri-apps/plugin-http";
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import { onMount } from "svelte";
-  import { settings } from "$lib/store.svelte";
   import { goto } from "$app/navigation";
+  import { settings } from "$lib/store";
 
   type AuthStage = "url" | "jwt" | "success" | "error";
 

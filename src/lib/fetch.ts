@@ -1,5 +1,5 @@
 import { fetch } from "@tauri-apps/plugin-http";
-import { settings } from "./store.svelte";
+import { settings } from "./store/settings.svelte";
 
 export async function fetcher(pathname: string, params?: URLSearchParams): Promise<Response> {
   const url = `${settings.state.auth?.url}${pathname}${params ? `?${params.toString()}` : ""}`;

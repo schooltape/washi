@@ -1,39 +1,16 @@
+import { fetcher, scraper } from "$lib/fetch";
 import { LazyStore } from "@tauri-apps/plugin-store";
 import { endOfWeek, startOfWeek } from "date-fns";
 import { getDashboard, getHomepage } from "serrator/scrapers";
 import type { SchoolboxDashboard, SchoolboxEvent, SchoolboxHomepage } from "serrator/types";
 import { getCalendar } from "serrator/wrappers";
-import { fetcher, scraper } from "./fetch";
-import type * as Types from "./store";
 
-class Settings {
-  private defaults = {
-    stateVersion: 1,
-    auth: null,
-    // theme: {
-    //   sync: true,
-    //   flavour: "macchiato",
-    //   accent: "pink"
-    // },
-  };
-
-  public state: Types.Settings = $state(this.defaults);
-  public store: LazyStore;
-  public initialised: boolean = $state(false);
-
-  constructor() {
-    this.store = new LazyStore("settings.json", { defaults: this.defaults });
-    this.store.onChange(() => this.sync());
-  }
-
-  /**
-   * syncs the values of the LazyStore with the Svelte state rune
-   */
-  async sync() {
-    this.initialised = true;
-    Object.assign(this.state, Object.fromEntries(await this.store.entries()));
-  }
-}
+type CacheData = {
+  dashboard?: SchoolboxDashboard;
+  timetable?: SchoolboxEvent[];
+  // key represents the numeric id of the homepage
+  homepages?: Record<string, SchoolboxHomepage>;
+};
 
 /**
  * provides methods to update specific cache entries
@@ -50,7 +27,7 @@ class Settings {
  * cache.init();
  */
 class Cache {
-  private defaults: Types.Cache = {};
+  private defaults: CacheData = {};
 
   public state = $state(this.defaults);
   public store: LazyStore;
@@ -144,5 +121,4 @@ class HomepageCache {
   }
 }
 
-export const settings = new Settings();
 export const cache = new Cache();
