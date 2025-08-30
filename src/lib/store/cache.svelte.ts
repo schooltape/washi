@@ -12,37 +12,30 @@ type CacheData = {
   homepages?: Record<string, SchoolboxHomepage>;
 };
 
-/**
- * provides methods to update specific cache entries
- *
- * @example
- * // updates the value of Cache.timetable which then updates the store (and is synced with the state automatically)
- * cache.updateTimetable();
- *
- * // access the data from the Svelte state rune
- * $inspect(cache.timetable);
- *
- * @example
- * // initiate the default cache values
- * cache.init();
- */
 class Cache {
   private defaults: CacheData = {};
 
-  public state = $state(this.defaults);
-  public store: LazyStore;
-  public initialised: boolean = $state(false);
-
-  public homepage: HomepageCache;
-  public dashboard: DashboardCache;
-  public timetable: TimetableCache;
+  state = $state(this.defaults);
+  store: LazyStore;
+  initialised: boolean = $state(false);
+  homepage: CacheItem<SchoolboxHomepage>;
+  dashboard: CacheItem<SchoolboxDashboard>;
+  timetable: CacheItem<SchoolboxEvent[]>;
 
   constructor() {
     this.store = new LazyStore("cache.json", { defaults: this.defaults });
     this.store.onChange(() => this.sync());
-    this.homepage = new HomepageCache(this);
-    this.dashboard = new DashboardCache(this);
-    this.timetable = new TimetableCache(this);
+    this.homepage = new CacheItem<SchoolboxHomepage>(
+      cache,
+      (id: string) => `homepage-${id}`,
+      (id: string) => scraper(`/homepage/${id}`, getHomepage),
+    );
+    this.dashboard = new CacheItem<SchoolboxDashboard>(cache, "dashboard", () => scraper("/", getDashboard));
+    this.timetable = new CacheItem<SchoolboxEvent[]>(cache, "timetable", async () => {
+      const date = new Date();
+      const dashboard = await cache.dashboard.get();
+      return getCalendar(fetcher, dashboard.user.id, startOfWeek(date), endOfWeek(date), true);
+    });
   }
 
   /**
@@ -66,58 +59,24 @@ class Cache {
   }
 }
 
-class DashboardCache {
-  constructor(private cache: Cache) {
-    this.cache = cache;
-  }
+class CacheItem<T> {
+  constructor(
+    private cache: Cache,
+    private key: string | ((...args: any[]) => string),
+    private updater: (...args: any[]) => Promise<T>,
+  ) {}
 
-  async get(): Promise<SchoolboxDashboard> {
-    const cached = await this.cache.get<SchoolboxDashboard>("dashboard");
+  async get(...args: any[]): Promise<T> {
+    const key = typeof this.key === "function" ? this.key(...args) : this.key;
+    const cached = await this.cache.get<T>(key);
     if (cached) return cached;
-    await this.update();
-    return (await this.cache.get("dashboard")) as SchoolboxDashboard;
+    await this.update(...args);
+    return (await this.cache.get(key)) as T;
   }
 
-  async update() {
-    await this.cache.update("dashboard", () => scraper("/", getDashboard));
-  }
-}
-
-class TimetableCache {
-  constructor(private cache: Cache) {
-    this.cache = cache;
-  }
-
-  async get(): Promise<SchoolboxEvent[]> {
-    const cached = await this.cache.get<SchoolboxEvent[]>("timetable");
-    if (cached) return cached;
-    await this.update();
-    return (await this.cache.get("timetable")) as SchoolboxEvent[];
-  }
-
-  async update() {
-    const date = new Date();
-    await this.cache.update("timetable", async () => {
-      const dashboard = await this.cache.dashboard.get();
-      return getCalendar(fetcher, dashboard.user.id, startOfWeek(date), endOfWeek(date), true);
-    });
-  }
-}
-
-class HomepageCache {
-  constructor(private cache: Cache) {
-    this.cache = cache;
-  }
-
-  async get(id: string): Promise<SchoolboxHomepage> {
-    const cached = await this.cache.get<SchoolboxHomepage>(`homepage-${id}`);
-    if (cached) return cached;
-    await this.update(id);
-    return (await this.cache.get(`homepage-${id}`)) as SchoolboxHomepage;
-  }
-
-  async update(id: string) {
-    await this.cache.update(`homepage-${id}`, () => scraper(`/homepage/${id}`, getHomepage));
+  async update(...args: any[]) {
+    const key = typeof this.key === "function" ? this.key(...args) : this.key;
+    await this.cache.update(key, () => this.updater(...args));
   }
 }
 

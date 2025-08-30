@@ -24,9 +24,9 @@ class Settings {
     // },
   };
 
-  public state: SettingsData = $state(this.defaults);
-  public store: LazyStore;
-  public initialised: boolean = $state(false);
+  state: SettingsData = $state(this.defaults);
+  store: LazyStore;
+  initialised: boolean = $state(false);
 
   constructor() {
     this.store = new LazyStore("settings.json", { defaults: this.defaults });
