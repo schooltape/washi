@@ -3,6 +3,7 @@ import { endOfWeek, startOfWeek } from "date-fns";
 import { getDashboard, getHomepage } from "serrator/scrapers";
 import type { SchoolboxDashboard, SchoolboxEvent, SchoolboxHomepage } from "serrator/types";
 import { getCalendar } from "serrator/wrappers";
+import { credentials } from "./credentials.svelte";
 import { PersistentStore } from "./store.svelte";
 
 type CacheData = {
@@ -58,8 +59,10 @@ class CacheItem<T> {
   }
 
   async update(...args: any[]) {
+    credentials.store.set("status", { type: "syncing" });
     const key = typeof this.key === "function" ? this.key(...args) : this.key;
     await this.cache.update(key, () => this.updater(...args));
+    credentials.store.set("status", { type: "synced" });
   }
 }
 

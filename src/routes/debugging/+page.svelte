@@ -1,7 +1,14 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import Button from "$components/Button.svelte";
-  import { cache, settings } from "$lib/store";
+  import { cache, credentials, settings } from "$lib/store";
+  import { path } from "@tauri-apps/api";
+  import { onMount } from "svelte";
+
+  onMount(async () => {
+    const appDataPath = await path.appDataDir();
+    console.log(appDataPath);
+  });
 </script>
 
 <main class="p-4">
@@ -21,6 +28,14 @@
   <Button
     onclick={async () => {
       await cache.store.reset();
+      invalidateAll();
+    }}>Reset Store</Button>
+
+  <h2>Credentials</h2>
+  {@render stateTable(credentials.state)}
+  <Button
+    onclick={async () => {
+      await credentials.store.reset();
       invalidateAll();
     }}>Reset Store</Button>
 </main>

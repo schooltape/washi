@@ -4,15 +4,16 @@
 export const prerender = true;
 export const ssr = false;
 
-import { cache, settings } from "$lib/store";
+import { cache, credentials, settings } from "$lib/store";
 import { redirect } from "@sveltejs/kit";
 import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ url }) => {
-  await settings.sync();
   await cache.sync();
+  await credentials.sync();
+  await settings.sync();
 
-  const isSignedIn = !!settings.state.auth;
+  const isSignedIn = !!credentials.state.auth;
 
   if (!isSignedIn && url.pathname !== "/auth") {
     throw redirect(302, "/auth");

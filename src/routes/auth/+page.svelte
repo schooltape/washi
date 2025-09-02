@@ -9,7 +9,7 @@
   import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import { settings } from "$lib/store";
+  import { credentials } from "$lib/store";
 
   type AuthStage = "url" | "jwt" | "success" | "error";
 
@@ -65,10 +65,11 @@
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        settings.store.set("auth", {
+        credentials.store.set("auth", {
           jwt: schoolboxJwt,
           url: schoolboxUrl,
         });
+        // credentials.store.set("status", { type: "synced" });
         statusMessage = `Authenticated as ${data.createdBy}`;
         authStage = "success";
         setTimeout(() => {
