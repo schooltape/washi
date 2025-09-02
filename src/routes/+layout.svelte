@@ -1,5 +1,5 @@
 <script>
-  import { onNavigate } from "$app/navigation";
+  import { goto, onNavigate } from "$app/navigation";
   import { ChevronsUpDown, Cloud, CloudAlert, CloudCheck, CloudOff } from "@lucide/svelte";
   import "../app.css";
   import { credentials } from "$lib/store";
@@ -74,14 +74,16 @@
 </div>
 
 {#snippet dropdownItem(/** @type {string} */ href, /** @type {string} */ name, /** @type {string[]} */ kbd = [])}
-  <DropdownMenu.Item class="rounded-md px-2 py-1 hover:bg-ctp-surface0">
-    <a {href} class="flex items-center justify-between gap-4">
-      <span class="text-ctp-text">{name}</span>
-      <div class="flex items-center gap-1">
-        {#each kbd as key}
-          <kbd>{key}</kbd>
-        {/each}
-      </div>
-    </a>
+  <DropdownMenu.Item
+    class="flex items-center justify-between gap-4 rounded-md px-2 py-1 hover:bg-ctp-surface0"
+    onSelect={() => {
+      goto(href);
+    }}>
+    <span class="text-ctp-text">{name}</span>
+    <div class="flex items-center gap-1">
+      {#each kbd as key}
+        <kbd>{key}</kbd>
+      {/each}
+    </div>
   </DropdownMenu.Item>
 {/snippet}
