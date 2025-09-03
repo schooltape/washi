@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { goto, onNavigate } from "$app/navigation";
   import { ChevronsUpDown, Cloud, CloudAlert, CloudCheck, CloudOff } from "@lucide/svelte";
   import "../app.css";
@@ -88,7 +88,7 @@
   </div>
 </div>
 
-{#snippet dropdownItem(/** @type {string} */ href, /** @type {string} */ name, /** @type {string[]} */ kbd = [])}
+{#snippet dropdownItem(href: string, name: string, kbd: string[] = [])}
   {#if href !== page.url.pathname}
     <DropdownMenu.Item
       class="flex items-center justify-between gap-4 rounded-md px-2 py-1 hover:bg-ctp-surface0"
