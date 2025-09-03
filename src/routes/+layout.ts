@@ -19,5 +19,7 @@ export const load: LayoutLoad = async ({ url }) => {
     throw redirect(302, "/auth");
   }
 
-  return {};
+  return {
+    title: "Washi",
+  };
 };
