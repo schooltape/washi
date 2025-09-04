@@ -1,14 +1,15 @@
 <script lang="ts">
   import { cache } from "$lib/store";
   import { School } from "@lucide/svelte";
-  import { Tabs } from "bits-ui";
   import { onMount } from "svelte";
-
-  import { getDay, format, differenceInMinutes, differenceInSeconds, addSeconds, getTime } from "date-fns";
+  import { Tabs as BitsTabs } from "bits-ui";
+  import { getDay, format, differenceInMinutes, differenceInSeconds, getTime } from "date-fns";
   import type { SchoolboxEvent } from "serrator/types";
+  import Dialog from "$components/Dialog.svelte";
+  import Tabs from "$components/Tabs.svelte";
 
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const selectedDay = $state(days[getDay(new Date())]);
+  let selectedDay = $state(days[getDay(new Date())]);
   let now = $state(new Date());
 
   let dailyTimetables = $derived(
@@ -81,19 +82,13 @@
   });
 </script>
 
-<Tabs.Root value={selectedDay}>
-  <Tabs.List class="flex w-full gap-2 border border-ctp-surface0 p-1 text-sm leading-[0.01em] font-semibold">
-    {#each days as day}
-      <Tabs.Trigger
-        value={day}
-        class="h-8 w-24 rounded-md py-2 transition-colors duration-300 data-[state=active]:bg-ctp-pink data-[state=active]:text-ctp-base"
-        >{day}</Tabs.Trigger>
-    {/each}
-  </Tabs.List>
-
+<Tabs bind:selectedItem={selectedDay} items={days}>
   {#if dailyTimetables}
     {#each getTimetableWithBreaks(dailyTimetables) as timetable, day}
-      <Tabs.Content value={days[day]} class="relative w-full p-4" style="min-height: {timetable.length * 100}px;">
+      <BitsTabs.Content
+        style={`min-height: ${timetable.length * 100}px;`}
+        class="relative w-full p-4"
+        value={days[day]}>
         {#if timetable.length === 0}
           No events scheduled for {days[day]}
         {/if}
@@ -124,21 +119,29 @@
                 {/if}
 
                 <!-- dot -->
-                <span
-                  class="grid w-8 place-items-center rounded-full"
-                  style="
-                      min-height: {50 + Math.max(length - 30, 0) * 3}px;
-                      background: {getBackground(getProgress(item.start, item.end))}
-                    ">
-                  <School class={getProgress(item.start, item.end) > 0.5 ? "stroke-ctp-mantle" : "stroke-ctp-text"} />
-                </span>
+                <Dialog
+                  triggerProps={{
+                    class: "grid w-8 place-items-center rounded-full",
+                    style: `
+                    min-height: ${50 + Math.max(length - 30, 0) * 3}px;
+                    background: ${getBackground(getProgress(item.start, item.end))}
+                  `,
+                  }}>
+                  {#snippet trigger()}
+                    <School class={getProgress(item.start, item.end) > 0.5 ? "stroke-ctp-mantle" : "stroke-ctp-text"} />
+                  {/snippet}
+                  {#snippet title()}
+                    Class settings
+                  {/snippet}
+                  {#snippet description()}
+                    Description
+                  {/snippet}
+                  What happens here
+                </Dialog>
 
                 <!-- connector -->
                 {#if i < timetable.length - 1}
-                  {@render connector(
-                    getProgress(item.end, getMidtime(item.end, timetable[i + 1].start)),
-                    differenceInMinutes(timetable[i + 1].start, item.end) > 10,
-                  )}
+                  {@render connector(getProgress(item.end, getMidtime(item.end, timetable[i + 1].start)))}
                 {:else}
                   <span class="min-h-2 flex-grow"></span>
                 {/if}
@@ -153,10 +156,10 @@
             </li>
           {/each}
         </ul>
-      </Tabs.Content>
+      </BitsTabs.Content>
     {/each}
   {/if}
-</Tabs.Root>
+</Tabs>
 
 {#snippet connector(progress: number)}
   <span class="min-h-2 w-0.5 flex-grow" style="background: {getBackground(progress)}"></span>
