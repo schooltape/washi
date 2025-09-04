@@ -53,6 +53,7 @@
                   {@render dropdownItem("/", "Home", ["⌘", "D"])}
                   {@render dropdownItem("/timetable", "Timetable", ["⌘", "T"])}
                   {@render dropdownItem("/debugging", "Debugging")}
+                  {@render dropdownItem("/auth", "Auth")}
                 </DropdownMenu.Group>
               </div>
             </div>
