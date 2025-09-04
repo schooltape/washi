@@ -1,6 +1,15 @@
 <script lang="ts">
   import { openUrl } from "@tauri-apps/plugin-opener";
-  import { ArrowBigLeft, Braces, CircleCheck, CircleQuestionMark, CircleX, LoaderCircle, Lock } from "@lucide/svelte";
+  import {
+    ArrowBigLeft,
+    Braces,
+    CircleCheck,
+    CircleQuestionMark,
+    CircleX,
+    LoaderCircle,
+    Lock,
+    LockKeyhole,
+  } from "@lucide/svelte";
   import { fade, slide } from "svelte/transition";
   import { asset } from "$app/paths";
   import Button from "$components/Button.svelte";
@@ -11,10 +20,8 @@
   import { goto } from "$app/navigation";
   import { credentials } from "$lib/store";
 
-  type AuthStage = "url" | "jwt" | "success" | "error";
-
-  let authMethod: "schooltape" | "manual" | undefined = $state();
-  let authStage: AuthStage = $state("url");
+  let authMethod: "schooltape" | "manual" | undefined = $state("manual");
+  let authStage: "url" | "jwt" | "success" | "error" = $state("jwt");
   let schoolboxUrl = $state("");
   let schoolboxJwt = $state("");
 
@@ -167,7 +174,11 @@
                 onsubmit={() => {
                   submitJwt(schoolboxJwt, schoolboxUrl);
                 }}>
-                <TextInput id="jwt-input" placeholder="JWT" bind:value={schoolboxJwt} />
+                <TextInput id="jwt-input" placeholder="JWT" bind:value={schoolboxJwt}>
+                  {#snippet icon(props)}
+                    <LockKeyhole {...props} />
+                  {/snippet}
+                </TextInput>
               </form>
 
               <div class="subtext-sm">
