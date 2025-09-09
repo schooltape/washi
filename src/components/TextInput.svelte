@@ -37,6 +37,6 @@
     {@render icon({ class: "size-9 px-2 text-ctp-overlay1" })}
   {/if}
   {#if submitButton}
-    <button class="rounded-r-md bg-ctp-pink p-2 text-ctp-base" type="submit" {onclick}>{label}</button>
+    <button class="rounded-r-md bg-(--ctp-accent) p-2 text-ctp-base" type="submit" {onclick}>{label}</button>
   {/if}
 </div>

@@ -10,7 +10,7 @@
 </script>
 
 <main>
-  <h1 class="flex items-center gap-2"><Clock class="stroke-ctp-pink" /> Timetable</h1>
+  <h1 class="flex items-center gap-2"><Clock class="stroke-(--ctp-accent)" /> Timetable</h1>
 
   <Timetable />
 </main>

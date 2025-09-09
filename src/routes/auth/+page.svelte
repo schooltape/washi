@@ -20,8 +20,8 @@
   import { goto } from "$app/navigation";
   import { credentials } from "$lib/store";
 
-  let authMethod: "schooltape" | "manual" | undefined = $state("manual");
-  let authStage: "url" | "jwt" | "success" | "error" = $state("jwt");
+  let authMethod: "schooltape" | "manual" | undefined = $state();
+  let authStage: "url" | "jwt" | "success" | "error" = $state("url");
   let schoolboxUrl = $state("");
   let schoolboxJwt = $state("");
 
@@ -72,11 +72,11 @@
       if (response.status === 200) {
         const data = await response.json();
         console.log(data);
-        credentials.store.set("auth", {
+        credentials.state.auth = {
           jwt: schoolboxJwt,
           url: schoolboxUrl,
-        });
-        // credentials.store.set("status", { type: "synced" });
+        };
+        // credentials.state.status = { type: "synced" };
         statusMessage = `Authenticated as ${data.createdBy}`;
         authStage = "success";
         setTimeout(() => {
@@ -148,7 +148,7 @@
           {#if authMethod === "schooltape"}
             <div class="grid h-full place-items-center gap-4" transition:slide>
               <h3>Authenticating with Schooltape...</h3>
-              <LoaderCircle size={48} class="animate-spin text-ctp-pink" />
+              <LoaderCircle size={48} class="animate-spin text-(--ctp-accent)" />
               <a
                 class="subtext-sm flex items-center gap-2"
                 href="https://schooltape.github.io"

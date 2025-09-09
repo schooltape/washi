@@ -21,6 +21,7 @@
     "@tauri-apps/plugin-store": "~2.4.0"
   },
   "devDependencies": {
+    "@catppuccin/palette": "^1.7.1",
     "@catppuccin/tailwindcss": "^1.0.0",
     "@lucide/svelte": "^0.541.0",
     "@sveltejs/adapter-static": "^3.0.9",

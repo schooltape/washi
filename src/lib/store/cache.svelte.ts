@@ -59,10 +59,10 @@ class CacheItem<T> {
   }
 
   async update(...args: any[]) {
-    credentials.store.set("status", { type: "syncing" });
+    credentials.state.status = { type: "syncing" };
     const key = typeof this.key === "function" ? this.key(...args) : this.key;
     await this.cache.update(key, () => this.updater(...args));
-    credentials.store.set("status", { type: "synced" });
+    credentials.state.status = { type: "synced" };
   }
 }
 

@@ -12,9 +12,6 @@
   h2 {
     font-size: var(--text-xl);
   }
-  body {
-    @apply bg-ctp-base text-ctp-text;
-  }
   kbd {
     @apply inline-flex size-5 items-center justify-center rounded-md border border-ctp-surface1 bg-ctp-mantle text-xs text-ctp-overlay0 shadow-md;
   }

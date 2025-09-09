@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cache } from "$lib/store";
+  import { cache, settings } from "$lib/store";
   import { School } from "@lucide/svelte";
   import { onMount } from "svelte";
   import { Tabs as BitsTabs } from "bits-ui";
@@ -64,14 +64,16 @@
   }
 
   function getBackground(progress: number) {
-    if (progress === 0) return "var(--catppuccin-color-overlay0)";
-    if (progress === 1) return "var(--catppuccin-color-pink)";
+    const overlay = "var(--catppuccin-color-overlay0)";
+    const accent = `var(--catppuccin-color-${settings.state.theme.accent})`;
+    if (progress === 0) return overlay;
+    if (progress === 1) return accent;
     return `linear-gradient(
       to bottom,
-      var(--catppuccin-color-pink) 0%,
-      var(--catppuccin-color-pink) ${progress * 100}%,
-      var(--catppuccin-color-overlay0) ${progress * 100}%,
-      var(--catppuccin-color-overlay0) 100%
+      ${accent} 0%,
+      ${accent} ${progress * 100}%,
+      ${overlay} ${progress * 100}%,
+      ${overlay} 100%
     )`;
   }
 
@@ -82,7 +84,7 @@
   });
 </script>
 
-<Tabs bind:selectedItem={selectedDay} items={days}>
+<Tabs bind:selectedItem={selectedDay} items={Object.fromEntries(days.map((x) => [x, x]))}>
   {#if dailyTimetables}
     {#each getTimetableWithBreaks(dailyTimetables) as timetable, day}
       <BitsTabs.Content

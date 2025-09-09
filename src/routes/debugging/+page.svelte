@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import Button from "$components/Button.svelte";
+  import ThemePicker from "$components/ThemePicker.svelte";
   import { cache, credentials, settings } from "$lib/store";
   import { path } from "@tauri-apps/api";
   import { onMount } from "svelte";
@@ -12,6 +13,8 @@
 </script>
 
 <main class="p-4">
+  <ThemePicker />
+
   <h1>Debugging</h1>
   <p>This page exists purely for debugging purposes and will be excluded from production builds.</p>
 
@@ -19,7 +22,7 @@
   {@render stateTable(settings.state)}
   <Button
     onclick={async () => {
-      await settings.store.reset();
+      await settings.reset();
       invalidateAll();
     }}>Reset Store</Button>
 
@@ -27,7 +30,7 @@
   {@render stateTable(cache.state)}
   <Button
     onclick={async () => {
-      await cache.store.reset();
+      await cache.reset();
       invalidateAll();
     }}>Reset Store</Button>
 
@@ -35,7 +38,7 @@
   {@render stateTable(credentials.state)}
   <Button
     onclick={async () => {
-      await credentials.store.reset();
+      await credentials.reset();
       invalidateAll();
     }}>Reset Store</Button>
 </main>
