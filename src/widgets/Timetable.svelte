@@ -87,10 +87,7 @@
 <Tabs bind:selectedItem={selectedDay} items={Object.fromEntries(days.map((x) => [x, x]))}>
   {#if dailyTimetables}
     {#each getTimetableWithBreaks(dailyTimetables) as timetable, day}
-      <BitsTabs.Content
-        style={`min-height: ${timetable.length * 100}px;`}
-        class="relative w-full p-4"
-        value={days[day]}>
+      <BitsTabs.Content style={`min-height: ${timetable.length * 100}px;`} class="relative w-full" value={days[day]}>
         {#if timetable.length === 0}
           No events scheduled for {days[day]}
         {/if}
