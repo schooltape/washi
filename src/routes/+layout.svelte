@@ -49,7 +49,7 @@
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
-        <DropdownMenu.Content class="rounded-lg bg-ctp-crust p-2" forceMount>
+        <DropdownMenu.Content class="rounded-lg bg-ctp-crust p-2 {settings.state.theme.flavour}" forceMount>
           {#snippet child({ wrapperProps, props, open })}
             {#if open}
               <div {...wrapperProps}>
@@ -105,7 +105,9 @@
       <span class="text-ctp-text">{name}</span>
       <div class="flex items-center gap-1">
         {#each kbd as key}
-          <kbd>{key}</kbd>
+          <kbd
+            class="inline-flex size-5 items-center justify-center rounded-md border border-ctp-surface1 bg-ctp-mantle text-xs text-ctp-overlay0 shadow-md"
+            >{key}</kbd>
         {/each}
       </div>
     </DropdownMenu.Item>
