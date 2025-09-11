@@ -6,6 +6,7 @@
     CircleCheck,
     CircleQuestionMark,
     CircleX,
+    Fingerprint,
     LoaderCircle,
     Lock,
     LockKeyhole,
@@ -19,6 +20,7 @@
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { credentials } from "$lib/store";
+  import Card from "$components/Card.svelte";
 
   let authMethod: "schooltape" | "manual" | undefined = $state();
   let authStage: "url" | "jwt" | "success" | "error" = $state("url");
@@ -97,10 +99,12 @@
 </script>
 
 <div class="grid h-full place-items-center">
-  <div class="card min-h-80 w-full max-w-xs">
-    <div class="flex h-10 items-center justify-between">
-      <h2>Login</h2>
-      <!-- back button -->
+  <Card contentProps={{ class: "min-h-40 min-w-60" }} title="Login">
+    {#snippet icon()}
+      <Fingerprint />
+    {/snippet}
+
+    {#snippet headerActions()}
       {#if authMethod !== undefined}
         <div transition:fade>
           <Button
@@ -116,9 +120,14 @@
             }}><ArrowBigLeft size={18} /> Back</Button>
         </div>
       {/if}
-    </div>
+    {/snippet}
 
-    <div class="flex-grow">
+    {#snippet footer()}
+      <p class="flex items-center gap-2 text-sm text-ctp-subtext0"><Lock size={18} /> Privacy Policy</p>
+    {/snippet}
+
+    <!-- main content -->
+    <div>
       {#if authMethod === undefined}
         <div transition:slide class="flex flex-col gap-2">
           <Button
@@ -150,7 +159,7 @@
               <h3>Authenticating with Schooltape...</h3>
               <LoaderCircle size={48} class="animate-spin text-(--ctp-accent)" />
               <a
-                class="subtext-sm flex items-center gap-2"
+                class="flex items-center gap-2 text-sm text-ctp-subtext0"
                 href="https://schooltape.github.io"
                 target="_blank"
                 rel="noopener noreferrer">
@@ -181,7 +190,7 @@
                 </TextInput>
               </form>
 
-              <div class="subtext-sm">
+              <div class="text-sm text-ctp-subtext0">
                 <button
                   class="mt-2 flex cursor-pointer items-center gap-2"
                   onclick={() => {
@@ -203,7 +212,5 @@
         </div>
       {/if}
     </div>
-
-    <p class="subtext-sm flex items-center gap-2"><Lock size={18} /> Privacy Policy</p>
-  </div>
+  </Card>
 </div>
