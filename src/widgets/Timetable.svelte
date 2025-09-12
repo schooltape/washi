@@ -7,7 +7,10 @@
   import type { SchoolboxEvent } from "serrator/types";
   import Dialog from "$components/Dialog.svelte";
   import Tabs from "$components/Tabs.svelte";
+  import ThemePicker from "$components/ThemePicker.svelte";
+  import type { AccentName } from "@catppuccin/palette";
 
+  let chosenAccent: AccentName = $state("pink");
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   let selectedDay = $state(days[getDay(new Date())]);
   let now = $state(new Date());
@@ -133,9 +136,10 @@
                     Class settings
                   {/snippet}
                   {#snippet description()}
-                    Description
+                    {item.title}
                   {/snippet}
-                  What happens here
+
+                  <ThemePicker bind:selectedAccent={chosenAccent} />
                 </Dialog>
 
                 <!-- connector -->

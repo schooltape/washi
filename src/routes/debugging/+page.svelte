@@ -13,7 +13,7 @@
 </script>
 
 <main class="p-4">
-  <ThemePicker />
+  <ThemePicker showTabs />
 
   <h1>Debugging</h1>
   <p>This page exists purely for debugging purposes and will be excluded from production builds.</p>

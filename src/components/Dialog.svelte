@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
   import { Dialog, Separator, type WithoutChild } from "bits-ui";
   import { X } from "@lucide/svelte";
+  import { settings } from "$lib/store";
 
   type Props = Dialog.RootProps & {
     trigger: Snippet;
@@ -31,12 +32,13 @@
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-ctp-base/80 backdrop-blur-md" />
     <Dialog.Content
-      class="fixed top-[50%] left-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] rounded-lg bg-ctp-mantle p-4 sm:max-w-[490px] md:w-full"
+      class="{settings.state.theme
+        .flavour} fixed top-[50%] left-[50%] z-50 flex w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] flex-col gap-4 rounded-lg bg-ctp-mantle p-4 text-ctp-text outline-3 outline-ctp-overlay0 sm:max-w-[490px] md:w-full"
       {...contentProps}>
       <Dialog.Title class="flex w-full items-center justify-center text-lg font-semibold tracking-tight">
         {@render title()}
       </Dialog.Title>
-      <Separator.Root class="-mx-5 mt-5 mb-6 block h-px bg-ctp-surface0" />
+      <Separator.Root class="-mx-4 block h-px bg-ctp-surface0" />
 
       <Dialog.Description>
         {@render description()}
