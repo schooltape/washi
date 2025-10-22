@@ -14,8 +14,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@tauri-apps/api": "^2.8.0",
-    "@tauri-apps/plugin-deep-link": "~2.4.2",
+    "@tauri-apps/api": "^2.9.0",
+    "@tauri-apps/plugin-deep-link": "~2.4.3",
     "@tauri-apps/plugin-http": "~2.5.2",
     "@tauri-apps/plugin-opener": "^2.5.0",
     "@tauri-apps/plugin-store": "~2.4.0"
@@ -24,22 +24,22 @@
     "@catppuccin/palette": "^1.7.1",
     "@catppuccin/tailwindcss": "^1.0.0",
     "@lucide/svelte": "^0.541.0",
-    "@sveltejs/adapter-static": "^3.0.9",
-    "@sveltejs/kit": "^2.36.2",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.47.2",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",
-    "@tailwindcss/vite": "^4.1.12",
-    "@tauri-apps/cli": "^2.8.3",
-    "bits-ui": "^2.9.4",
+    "@tailwindcss/vite": "^4.1.15",
+    "@tauri-apps/cli": "^2.9.0",
+    "bits-ui": "^2.14.0",
     "date-fns": "^4.1.0",
     "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.2.0",
+    "prettier-plugin-organize-imports": "^4.3.0",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "serrator": "github:schooltape/serrator",
-    "svelte": "^5.38.3",
-    "svelte-check": "^4.3.1",
-    "tailwindcss": "^4.1.12",
+    "svelte": "^5.41.1",
+    "svelte-check": "^4.3.3",
+    "tailwindcss": "^4.1.15",
     "typescript": "~5.6.3",
-    "vite": "^6.3.5"
+    "vite": "^6.4.1"
   }
 }
