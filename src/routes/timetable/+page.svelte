@@ -6,6 +6,7 @@
 
   onMount(async () => {
     await cache.timetable.update();
+    await cache.classes.update();
   });
 </script>
 

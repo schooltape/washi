@@ -24,7 +24,7 @@
 
   let authMethod: "schooltape" | "manual" | undefined = $state();
   let authStage: "url" | "jwt" | "success" | "error" = $state("url");
-  let schoolboxUrl = $state("");
+  let schoolboxDomain = $state("");
   let schoolboxJwt = $state("");
 
   let jwtHelp = $state(false);
@@ -40,8 +40,8 @@
       };
       if (params.jwt && params.url) {
         schoolboxJwt = params.jwt;
-        schoolboxUrl = params.url;
-        submitJwt(schoolboxJwt, schoolboxUrl);
+        schoolboxDomain = params.url;
+        submitJwt(schoolboxJwt, schoolboxDomain);
       } else {
         const e = "Malformed deep link";
         console.error(e);
@@ -51,9 +51,9 @@
     });
   });
 
-  async function submitJwt(schoolboxJwt: string, schoolboxUrl: string) {
-    if (!schoolboxUrl.startsWith("https://")) {
-      schoolboxUrl = "https://" + schoolboxUrl;
+  async function submitJwt(schoolboxJwt: string, schoolboxDomain: string) {
+    if (schoolboxDomain.startsWith("https://")) {
+      schoolboxDomain = schoolboxDomain.replace("https://", "");
     }
 
     // trim quotes from schoolboxJwt
@@ -61,7 +61,7 @@
 
     // verify JWT is valid
     try {
-      const response = await fetch(`${schoolboxUrl}/user/token`, {
+      const response = await fetch(`https://${schoolboxDomain}/user/token`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@
         console.log(data);
         credentials.state.auth = {
           jwt: schoolboxJwt,
-          url: schoolboxUrl,
+          domain: schoolboxDomain,
         };
         // credentials.state.status = { type: "synced" };
         statusMessage = `Authenticated as ${data.createdBy}`;
@@ -109,7 +109,7 @@
         <div transition:fade>
           <Button
             onclick={() => {
-              schoolboxUrl = "";
+              schoolboxDomain = "";
               schoolboxJwt = "";
               jwtHelp = false;
 
@@ -170,18 +170,18 @@
             {#if authStage === "url"}
               <form
                 onsubmit={() => {
-                  if (!schoolboxUrl.startsWith("https://")) {
-                    schoolboxUrl = "https://" + schoolboxUrl;
+                  if (!schoolboxDomain.startsWith("https://")) {
+                    schoolboxDomain = "https://" + schoolboxDomain;
                   }
-                  openUrl(`${schoolboxUrl}/user/token`);
+                  openUrl(`${schoolboxDomain}/user/token`);
                   authStage = "jwt";
                 }}>
-                <TextInput id="schoolbox-url" bind:value={schoolboxUrl} placeholder="Enter Schoolbox URL" />
+                <TextInput id="schoolbox-url" bind:value={schoolboxDomain} placeholder="Enter Schoolbox URL" />
               </form>
             {:else if authStage === "jwt"}
               <form
                 onsubmit={() => {
-                  submitJwt(schoolboxJwt, schoolboxUrl);
+                  submitJwt(schoolboxJwt, schoolboxDomain);
                 }}>
                 <TextInput id="jwt-input" placeholder="JWT" bind:value={schoolboxJwt}>
                   {#snippet icon(props)}
