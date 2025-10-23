@@ -3,6 +3,8 @@
   import { onMount } from "svelte";
   import { getDay, format, differenceInSeconds, getTime, addDays, startOfWeek } from "date-fns";
   import type { SchoolboxClass, SchoolboxTimetableEvent } from "serrator/types";
+  import { env } from "$env/dynamic/public";
+  import { getCtx } from "$lib/store/credentials.svelte";
 
   type Event = SchoolboxTimetableEvent & { info: SchoolboxClass };
   type StartTime = number; // timestamp in milliseconds
@@ -89,7 +91,8 @@
       {/if}
 
       <div class="z-10 flex items-center justify-between gap-2 px-4 py-2">
-        <div class="flex min-w-0 items-center gap-4">
+        <!-- indicator and events -->
+        <div class="flex min-w-0 grow items-center gap-4">
           <!-- period indicator -->
           <div
             class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold {inProgress
@@ -101,14 +104,16 @@
           </div>
 
           <!-- event details -->
-          <div class="flex min-w-0 flex-col">
+          <div class="flex min-w-0 grow flex-col">
             {#each period as event}
-              <div class="flex flex-col">
-                <span class="truncate font-semibold" class:text-ctp-subtext0={dayInProgress && completed}>
+              <a href="https://{getCtx().domain}{period[0].info.url}" target="_blank" class="group flex flex-col">
+                <span
+                  class="truncate font-semibold group-hover:text-ctp-pink"
+                  class:text-ctp-subtext0={dayInProgress && completed}>
                   {event.info.name.replace(/^.*-\s*/, "")}
                 </span>
-                <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
-              </div>
+                <span class="text-xs text-ctp-subtext0 group-hover:text-ctp-text">@ {event.location}</span>
+              </a>
             {/each}
           </div>
         </div>
