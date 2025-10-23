@@ -79,7 +79,7 @@
 
   {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
     {@const now = new Date()}
-    {@const inProgress = now >= period[0].start && now < period[0].end}
+    {@const inProgress = now >= new Date(period[0].start) && now < new Date(period[0].end)}
     {@const progress = getProgress(period[0].start, period[0].end)}
     {@const completed = now > new Date(period[0].end)}
 
