@@ -50,12 +50,13 @@
   <div class="flex w-full">
     {#each { length: 7 } as _, i}
       {@const isSelected = getDay(selectedDate) === i}
-      {@const day = format(addDays(startOfWeek(new Date()), i), "EEE")}
+      {@const day = addDays(startOfWeek(new Date()), i)}
       <button
         class:text-ctp-pink={isSelected}
-        class="relative grid flex-1 cursor-pointer place-items-center border-b border-ctp-surface0 p-2 hover:bg-ctp-surface0"
+        class="relative grid flex-1 cursor-pointer place-items-center border-b border-ctp-surface0 p-2 text-xs hover:bg-ctp-surface0"
         onclick={() => (selectedDate = addDays(startOfWeek(selectedDate), i))}>
-        <span class="text-sm uppercase">{day}</span>
+        <span class="uppercase">{format(day, "EEE")}</span>
+        <span>{format(day, "d")}</span>
         {#if isSelected}
           <div class="absolute bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-ctp-pink"></div>
         {/if}
