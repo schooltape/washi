@@ -72,34 +72,46 @@
   </div>
   {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
     {@const now = new Date()}
-    {@const isCurrentPeriod = now >= period[0].start && now < period[0].end}
+    {@const inProgress = now >= period[0].start && now < period[0].end}
     {@const progress = getProgress(period[0].start, period[0].end)}
 
     <div
-      class="relative flex items-center justify-between gap-2 p-2 hover:bg-ctp-surface0 {i <
+      class="relative flex items-center justify-between gap-2 px-4 py-2 hover:bg-ctp-surface0 {i <
       Object.keys(timetable[getDay(selectedDate)]).length - 1
         ? 'border-b border-ctp-surface0'
         : ''}">
       <!-- progress bar -->
-      {#if isCurrentPeriod}
+      {#if inProgress}
         <div
           class="pointer-events-none absolute top-0 left-0 h-full bg-ctp-pink opacity-20"
           style="width: {progress * 100}%">
         </div>
       {/if}
-      <!-- event details -->
-      <div class="flex min-w-0 flex-col gap-2">
-        {#each period as event}
-          <div class="flex flex-col">
-            <span
-              class="truncate font-semibold"
-              class:text-ctp-subtext0={dayInProgress && new Date() > new Date(event.end)}>
-              {event.info.name.replace(/^.*-\s*/, "")}
-            </span>
-            <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
-          </div>
-        {/each}
+
+      <div class="flex min-w-0 items-center gap-4">
+        <!-- period indicator -->
+        <div
+          class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold {inProgress
+            ? 'bg-ctp-pink text-ctp-base'
+            : 'bg-ctp-pink-50/10 text-ctp-pink'}">
+          {i + 1}
+        </div>
+
+        <!-- event details -->
+        <div class="flex min-w-0 flex-col">
+          {#each period as event}
+            <div class="flex flex-col">
+              <span
+                class="truncate font-semibold"
+                class:text-ctp-subtext0={dayInProgress && new Date() > new Date(event.end)}>
+                {event.info.name.replace(/^.*-\s*/, "")}
+              </span>
+              <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
+            </div>
+          {/each}
+        </div>
       </div>
+
       <!-- period time -->
       <span class="text-xs whitespace-nowrap text-ctp-subtext0"
         >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
