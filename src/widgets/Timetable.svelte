@@ -3,9 +3,8 @@
   import { onMount } from "svelte";
   import { getDay, format, differenceInSeconds, getTime, addDays, startOfWeek } from "date-fns";
   import type { SchoolboxClass, SchoolboxTimetableEvent } from "serrator/types";
-  import { env } from "$env/dynamic/public";
   import { getCtx } from "$lib/store/credentials.svelte";
-  import { blur, crossfade, draw, fade, fly, slide } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import { ExternalLink } from "@lucide/svelte";
 
   type Event = SchoolboxTimetableEvent & { info: SchoolboxClass };
@@ -16,6 +15,8 @@
 
   let selectedDate = $state(new Date());
   // $inspect(selectedDate);
+
+  let now = $state(new Date());
 
   let dayInProgress = $derived.by(() => {
     const times = Object.keys(timetable[getDay(selectedDate)]).map(Number);
@@ -29,7 +30,6 @@
   }
 
   function getProgress(start: Date, end: Date) {
-    const now = new Date();
     const duration = differenceInSeconds(end, start);
     const elapsed = differenceInSeconds(now, start);
 
@@ -54,6 +54,10 @@
         info: classInfo,
       });
     }
+
+    setInterval(() => {
+      now = new Date();
+    }, 1000);
   });
 </script>
 
@@ -78,9 +82,7 @@
   </div>
 
   {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
-    {@const now = new Date()}
     {@const inProgress = now >= new Date(period[0].start) && now < new Date(period[0].end)}
-    {@const progress = getProgress(period[0].start, period[0].end)}
     {@const completed = now > new Date(period[0].end)}
 
     <div
@@ -93,7 +95,7 @@
       {#if inProgress}
         <div
           class="pointer-events-none absolute top-0 left-0 h-full bg-ctp-pink-50/10"
-          style="width: {progress * 100}%">
+          style="width: {getProgress(period[0].start, period[0].end) * 100}%">
         </div>
       {/if}
 
@@ -102,7 +104,7 @@
         <div class="flex min-w-0 grow items-center gap-4">
           <!-- period indicator -->
           <div
-            class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold {inProgress
+            class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold transition-colors {inProgress
               ? 'bg-ctp-pink text-ctp-base'
               : completed
                 ? 'border border-ctp-surface1 bg-ctp-surface0/50 text-ctp-subtext0'
