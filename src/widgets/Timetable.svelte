@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { cache, settings } from "$lib/store";
-  import { School } from "@lucide/svelte";
+  import { cache } from "$lib/store";
   import { onMount } from "svelte";
-  import { getDay, format, differenceInMinutes, differenceInSeconds, getTime } from "date-fns";
-  import { getCtx } from "$lib/store/credentials.svelte";
+  import { getDay, format, differenceInSeconds, getTime, addDays, startOfWeek } from "date-fns";
   import type { SchoolboxClass, SchoolboxTimetableEvent } from "serrator/types";
 
   type Event = SchoolboxTimetableEvent & { info: SchoolboxClass };
@@ -12,7 +10,8 @@
   let timetable: Record<StartTime, Event[]>[] = $state(Array.from({ length: 7 }, () => ({})));
   // $inspect(timetable);
 
-  const day = getDay(new Date());
+  let selectedDate = $state(new Date());
+  $inspect(selectedDate);
 
   function getFormattedTime(date: Date) {
     return format(date, "h:mm aaa");
@@ -48,10 +47,25 @@
 </script>
 
 <div class="m-8 flex flex-col overflow-clip rounded-xl border-1 border-ctp-surface0 bg-ctp-mantle">
-  {#each Object.values(timetable[day]) as period, i}
+  <div class="flex w-full">
+    {#each { length: 7 } as _, i}
+      {@const isSelected = getDay(selectedDate) === i}
+      {@const day = format(addDays(startOfWeek(new Date()), i), "EEE")}
+      <button
+        class:text-ctp-pink={isSelected}
+        class="relative grid flex-1 cursor-pointer place-items-center border-b border-ctp-surface0 p-2 hover:bg-ctp-surface0"
+        onclick={() => (selectedDate = addDays(startOfWeek(selectedDate), i))}>
+        <span class="text-sm uppercase">{day}</span>
+        {#if isSelected}
+          <div class="absolute bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-ctp-pink"></div>
+        {/if}
+      </button>
+    {/each}
+  </div>
+  {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
     <div
       class="flex items-center justify-between gap-2 p-2 hover:bg-ctp-surface0 {i <
-      Object.keys(timetable[day]).length - 1
+      Object.keys(timetable[getDay(selectedDate)]).length - 1
         ? 'border-b border-ctp-surface0'
         : ''}">
       <div class="flex min-w-0 flex-col gap-2">
@@ -67,5 +81,9 @@
       <span class="text-xs whitespace-nowrap text-ctp-subtext0"
         >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
     </div>
+  {:else}
+    <p class="p-4 text-center text-ctp-subtext0">
+      No classes scheduled for {format(selectedDate, "EEEE")}
+    </p>
   {/each}
 </div>
