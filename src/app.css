@@ -1,11 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Flow+Circular&display=swap");
 @import "tailwindcss";
 @import "@catppuccin/tailwindcss/mocha.css";
 
 @theme {
   --shadow-kbd: 0px 2px 0px 0px rgba(0, 0, 245, 0.07);
+  --font-flow: "Flow Circular", system-ui;
 }
 
 @layer base {
+  /*body {
+    @apply font-flow;
+  }*/
   h1 {
     font-size: var(--text-2xl);
   }
