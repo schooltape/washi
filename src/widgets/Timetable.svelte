@@ -11,7 +11,14 @@
   // $inspect(timetable);
 
   let selectedDate = $state(new Date());
-  $inspect(selectedDate);
+  // $inspect(selectedDate);
+
+  let dayInProgress = $derived.by(() => {
+    const times = Object.keys(timetable[getDay(selectedDate)]).map(Number);
+    if (times.length === 0) return false;
+    const now = getTime(new Date());
+    return times[0] < now && now < times[times.length - 1];
+  });
 
   function getFormattedTime(date: Date) {
     return format(date, "h:mm aaa");
@@ -72,7 +79,9 @@
       <div class="flex min-w-0 flex-col gap-2">
         {#each period as event}
           <div class="flex flex-col">
-            <span class="truncate font-semibold">
+            <span
+              class="truncate font-semibold"
+              class:text-ctp-subtext0={dayInProgress && new Date() > new Date(event.end)}>
               {event.info.name.replace(/^.*-\s*/, "")}
             </span>
             <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
