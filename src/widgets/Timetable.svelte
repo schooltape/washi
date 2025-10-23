@@ -46,7 +46,7 @@
   });
 </script>
 
-<div class="m-8 flex flex-col overflow-clip rounded-xl border-1 border-ctp-surface0 bg-ctp-mantle">
+<div class="m-8 flex flex-col overflow-clip rounded-xl border border-ctp-surface0 bg-ctp-mantle">
   <div class="flex w-full">
     {#each { length: 7 } as _, i}
       {@const isSelected = getDay(selectedDate) === i}
