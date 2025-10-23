@@ -5,6 +5,8 @@
   import type { SchoolboxClass, SchoolboxTimetableEvent } from "serrator/types";
   import { env } from "$env/dynamic/public";
   import { getCtx } from "$lib/store/credentials.svelte";
+  import { blur, crossfade, draw, fade, fly, slide } from "svelte/transition";
+  import { ExternalLink } from "@lucide/svelte";
 
   type Event = SchoolboxTimetableEvent & { info: SchoolboxClass };
   type StartTime = number; // timestamp in milliseconds
@@ -62,16 +64,19 @@
       {@const day = addDays(startOfWeek(new Date()), i)}
       <button
         class:text-ctp-pink={isSelected}
-        class="relative grid flex-1 cursor-pointer place-items-center border-b border-ctp-surface0 p-2 text-xs hover:bg-ctp-surface0"
+        class="group relative grid flex-1 cursor-pointer place-items-center border-b border-ctp-surface0 p-2 text-xs transition-colors hover:bg-ctp-surface0"
         onclick={() => (selectedDate = addDays(startOfWeek(selectedDate), i))}>
         <span class="uppercase">{format(day, "EEE")}</span>
         <span>{format(day, "d")}</span>
-        {#if isSelected}
-          <div class="absolute bottom-0.5 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-ctp-pink"></div>
-        {/if}
+        <div
+          class="absolute bottom-0.5 left-1/2 h-0.5 -translate-x-1/2 rounded-full bg-ctp-pink transition-all duration-500 {isSelected
+            ? 'w-8'
+            : 'opacity-0 group-hover:w-3 group-hover:opacity-100'}">
+        </div>
       </button>
     {/each}
   </div>
+
   {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
     {@const now = new Date()}
     {@const inProgress = now >= period[0].start && now < period[0].end}
@@ -79,7 +84,9 @@
     {@const completed = now > new Date(period[0].end)}
 
     <div
-      class="relative hover:bg-ctp-surface0 {i < Object.keys(timetable[getDay(selectedDate)]).length - 1
+      transition:slide
+      class="relative transition-colors hover:bg-ctp-surface0 {i <
+      Object.keys(timetable[getDay(selectedDate)]).length - 1
         ? 'border-b border-ctp-surface0'
         : ''}">
       <!-- progress bar -->
@@ -107,12 +114,17 @@
           <div class="flex min-w-0 grow flex-col">
             {#each period as event}
               <a href="https://{getCtx().domain}{period[0].info.url}" target="_blank" class="group flex flex-col">
-                <span
-                  class="truncate font-semibold group-hover:text-ctp-pink"
-                  class:text-ctp-subtext0={dayInProgress && completed}>
-                  {event.info.name.replace(/^.*-\s*/, "")}
+                <span class="flex items-center gap-1">
+                  <span
+                    class="truncate font-semibold transition-colors group-hover:text-ctp-pink"
+                    class:text-ctp-subtext0={dayInProgress && completed}>
+                    {event.info.name.replace(/^.*-\s*/, "")}
+                  </span>
+                  <ExternalLink
+                    class="mb-0.5 size-4 shrink-0 stroke-ctp-overlay1 opacity-0 transition-opacity group-hover:opacity-100" />
                 </span>
-                <span class="text-xs text-ctp-subtext0 group-hover:text-ctp-text">@ {event.location}</span>
+                <span class="text-xs text-ctp-subtext0 transition-colors group-hover:text-ctp-text"
+                  >@ {event.location}</span>
               </a>
             {/each}
           </div>
