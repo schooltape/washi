@@ -7,7 +7,10 @@
   import type { SchoolboxClass, SchoolboxTimetableEvent } from "serrator/types";
 
   type Event = SchoolboxTimetableEvent & { info: SchoolboxClass };
-  let timetable: Event[][] = $state(Array.from({ length: 7 }, () => []));
+  type StartTime = number; // timestamp in milliseconds
+
+  let timetable: Record<StartTime, Event[]>[] = $state(Array.from({ length: 7 }, () => ({})));
+  // $inspect(timetable);
 
   const day = getDay(new Date());
 
@@ -24,9 +27,6 @@
   }
 
   onMount(async () => {
-    const ctx = await getCtx();
-    console.log("ctx", ctx);
-
     const classes = await cache.classes.get();
 
     const tt = await cache.timetable.get();
@@ -34,31 +34,38 @@
       const dayIndex = getDay(entry.start); // 0-6
       const classInfo = classes.find((c) => c.code === entry.code);
       if (!classInfo) throw new Error("class info not found for code: " + entry.code);
-      timetable[dayIndex].push({
+
+      const startTime = getTime(entry.start);
+      if (!timetable[dayIndex][startTime]) {
+        timetable[dayIndex][startTime] = [];
+      }
+      timetable[dayIndex][startTime].push({
         ...entry,
         info: classInfo,
       });
     }
-
-    console.log(timetable[day]);
   });
-
-  console.log("timetable", timetable);
 </script>
 
 <div class="m-8 flex flex-col overflow-clip rounded-xl border-1 border-ctp-surface0 bg-ctp-mantle">
-  {#each timetable[day] as entry, i}
-    <div class="hover:bg-ctp-surface0 {i < timetable[day].length - 1 ? 'border-b border-ctp-surface0' : ''}">
-      <div class="flex items-center justify-between p-2">
-        <div class="flex flex-col">
-          <span class="font-semibold">
-            <!-- removed text proceeding and including the first dash -->
-            {entry.info.name.replace(/^.*-\s*/, "")}
-          </span>
-          <span class="text-xs text-ctp-subtext0">@ {entry.location}</span>
-        </div>
-        <span class="text-xs text-ctp-subtext0">{getFormattedTime(entry.start)} - {getFormattedTime(entry.end)}</span>
+  {#each Object.values(timetable[day]) as period, i}
+    <div
+      class="flex items-center justify-between gap-2 p-2 hover:bg-ctp-surface0 {i <
+      Object.keys(timetable[day]).length - 1
+        ? 'border-b border-ctp-surface0'
+        : ''}">
+      <div class="flex min-w-0 flex-col gap-2">
+        {#each period as event}
+          <div class="flex flex-col">
+            <span class="truncate font-semibold">
+              {event.info.name.replace(/^.*-\s*/, "")}
+            </span>
+            <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
+          </div>
+        {/each}
       </div>
+      <span class="text-xs whitespace-nowrap text-ctp-subtext0"
+        >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
     </div>
   {/each}
 </div>
