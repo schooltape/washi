@@ -77,45 +77,46 @@
     {@const completed = now > new Date(period[0].end)}
 
     <div
-      class="relative flex items-center justify-between gap-2 px-4 py-2 hover:bg-ctp-surface0 {i <
-      Object.keys(timetable[getDay(selectedDate)]).length - 1
+      class="relative hover:bg-ctp-surface0 {i < Object.keys(timetable[getDay(selectedDate)]).length - 1
         ? 'border-b border-ctp-surface0'
         : ''}">
       <!-- progress bar -->
       {#if inProgress}
         <div
-          class="pointer-events-none absolute top-0 left-0 h-full bg-ctp-pink opacity-20"
+          class="pointer-events-none absolute top-0 left-0 h-full bg-ctp-pink-50/10"
           style="width: {progress * 100}%">
         </div>
       {/if}
 
-      <div class="flex min-w-0 items-center gap-4">
-        <!-- period indicator -->
-        <div
-          class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold {inProgress
-            ? 'bg-ctp-pink text-ctp-base'
-            : completed
-              ? 'bg-ctp-surface0 text-ctp-subtext0'
-              : 'bg-ctp-pink-50/10 text-ctp-pink'}">
-          {i + 1}
+      <div class="z-10 flex items-center justify-between gap-2 px-4 py-2">
+        <div class="flex min-w-0 items-center gap-4">
+          <!-- period indicator -->
+          <div
+            class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold {inProgress
+              ? 'bg-ctp-pink text-ctp-base'
+              : completed
+                ? 'border border-ctp-surface1 bg-ctp-surface0/50 text-ctp-subtext0'
+                : 'border border-ctp-pink/20 bg-ctp-pink-50/10 text-ctp-pink'}">
+            {i + 1}
+          </div>
+
+          <!-- event details -->
+          <div class="flex min-w-0 flex-col">
+            {#each period as event}
+              <div class="flex flex-col">
+                <span class="truncate font-semibold" class:text-ctp-subtext0={dayInProgress && completed}>
+                  {event.info.name.replace(/^.*-\s*/, "")}
+                </span>
+                <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
+              </div>
+            {/each}
+          </div>
         </div>
 
-        <!-- event details -->
-        <div class="flex min-w-0 flex-col">
-          {#each period as event}
-            <div class="flex flex-col">
-              <span class="truncate font-semibold" class:text-ctp-subtext0={dayInProgress && completed}>
-                {event.info.name.replace(/^.*-\s*/, "")}
-              </span>
-              <span class="text-xs text-ctp-subtext0">@ {event.location}</span>
-            </div>
-          {/each}
-        </div>
+        <!-- period time -->
+        <span class="text-xs whitespace-nowrap text-ctp-subtext0"
+          >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
       </div>
-
-      <!-- period time -->
-      <span class="text-xs whitespace-nowrap text-ctp-subtext0"
-        >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
     </div>
   {:else}
     <p class="p-4 text-center text-ctp-subtext0">
