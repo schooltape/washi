@@ -71,11 +71,23 @@
     {/each}
   </div>
   {#each Object.values(timetable[getDay(selectedDate)]) as period, i}
+    {@const now = new Date()}
+    {@const isCurrentPeriod = now >= period[0].start && now < period[0].end}
+    {@const progress = getProgress(period[0].start, period[0].end)}
+
     <div
-      class="flex items-center justify-between gap-2 p-2 hover:bg-ctp-surface0 {i <
+      class="relative flex items-center justify-between gap-2 p-2 hover:bg-ctp-surface0 {i <
       Object.keys(timetable[getDay(selectedDate)]).length - 1
         ? 'border-b border-ctp-surface0'
         : ''}">
+      <!-- progress bar -->
+      {#if isCurrentPeriod}
+        <div
+          class="pointer-events-none absolute top-0 left-0 h-full bg-ctp-pink opacity-20"
+          style="width: {progress * 100}%">
+        </div>
+      {/if}
+      <!-- event details -->
       <div class="flex min-w-0 flex-col gap-2">
         {#each period as event}
           <div class="flex flex-col">
@@ -88,6 +100,7 @@
           </div>
         {/each}
       </div>
+      <!-- period time -->
       <span class="text-xs whitespace-nowrap text-ctp-subtext0"
         >{getFormattedTime(period[0].start)} - {getFormattedTime(period[0].end)}</span>
     </div>
