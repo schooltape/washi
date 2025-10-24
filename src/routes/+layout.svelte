@@ -7,6 +7,7 @@
   import { slide } from "svelte/transition";
   import { page } from "$app/state";
   import { flavors } from "@catppuccin/palette";
+  import { asset } from "$app/paths";
 
   let { children } = $props();
   let dropdownOpen = $state(false);
@@ -42,6 +43,7 @@
           .state.auth
           ? 'hover:bg-ctp-surface0'
           : ''}">
+        <img src={asset("/favicon.png")} alt="washi icon" class="size-4" />
         <span class="font-semibold">{page.data.title}</span>
         {#if !!credentials.state.auth}
           <ChevronsUpDown class="-mr-1 size-4" />
@@ -69,7 +71,7 @@
     </DropdownMenu.Root>
 
     <div class="flex h-full items-center pr-1.5">
-      <div data-tauri-drag-region class="h-full flex-grow">&nbsp;</div>
+      <div data-tauri-drag-region class="h-full grow">&nbsp;</div>
 
       <div>
         {#if !!credentials.state.auth}
