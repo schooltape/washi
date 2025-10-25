@@ -1,13 +1,13 @@
 <script lang="ts">
+  import "../app.css";
   import { goto, onNavigate } from "$app/navigation";
   import { ChevronsUpDown, Cloud, CloudAlert, CloudCheck, CloudOff } from "@lucide/svelte";
-  import "../app.css";
   import { credentials, settings } from "$lib/store";
   import { DropdownMenu } from "bits-ui";
-  import { slide } from "svelte/transition";
   import { page } from "$app/state";
   import { flavors } from "@catppuccin/palette";
   import { asset } from "$app/paths";
+  import { onMount } from "svelte";
 
   let { children } = $props();
   let dropdownOpen = $state(false);
@@ -23,6 +23,35 @@
         await navigation.complete;
       });
     });
+  });
+
+  function handleTriggerKeydown(e: KeyboardEvent) {
+    console.log(e.code, e.key);
+    if (e.code === "Space" && !dropdownOpen) {
+      dropdownOpen = true;
+    } else if (dropdownOpen) {
+      if (e.key.toLowerCase() === "t") {
+        goto("/timetable");
+      } else if (e.key.toLowerCase() === "h") {
+        goto("/");
+      } else if (e.key.toLowerCase() === "d") {
+        goto("/debugging");
+      } else if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) {
+        return;
+      }
+
+      dropdownOpen = false;
+    } else {
+      return;
+    }
+    e.preventDefault();
+  }
+
+  onMount(() => {
+    window.addEventListener("keydown", handleTriggerKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleTriggerKeydown);
+    };
   });
 </script>
 
@@ -55,11 +84,11 @@
           {#snippet child({ wrapperProps, props, open })}
             {#if open}
               <div {...wrapperProps}>
-                <div {...props} transition:slide>
+                <div {...props}>
                   <DropdownMenu.Group class="flex flex-col gap-2">
-                    {@render dropdownItem("/", "Home", ["⌘", "D"])}
-                    {@render dropdownItem("/timetable", "Timetable", ["⌘", "T"])}
-                    {@render dropdownItem("/debugging", "Debugging")}
+                    {@render dropdownItem("/", "Home", ["H"])}
+                    {@render dropdownItem("/timetable", "Timetable", ["T"])}
+                    {@render dropdownItem("/debugging", "Debugging", ["D"])}
                     {@render dropdownItem("/auth", "Auth")}
                   </DropdownMenu.Group>
                 </div>
